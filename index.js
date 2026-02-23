@@ -29,10 +29,10 @@ var questionsArr = [
 const quizElement = document.getElementById('quiz');
 let questionIndex = 0;
 let score = 0;
-let timerId;
+let timer;
 
 function initQuiz() {
-  if (timerId) clearInterval(timerId);
+  if (timer) clearInterval(timer);
 
   quizElement.innerHTML = '';
   const previousScore = localStorage.getItem('previous-score');
@@ -57,7 +57,7 @@ function startQuiz() {
 }
 
 function showQuestion() {
-  if (timerId) clearInterval(timerId);
+  if (timer) clearInterval(timer);
 
   if (questionIndex >= questionsArr.length) {
     const finalScore = Math.round((score / questionsArr.length) * 100);
@@ -73,34 +73,34 @@ function showQuestion() {
   questionText.textContent = currentQuestion.question;
   quizElement.appendChild(questionText);
 
-  const choicesDiv = document.createElement('div');
+  const choices = document.createElement('div');
   currentQuestion.options.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
     btn.addEventListener('click', () => {
       if (option === currentQuestion.answer) score++;
-      clearInterval(timerId);
+      clearInterval(timer);
       questionIndex++;
       showQuestion();
     });
-    choicesDiv.appendChild(btn);
+    choices.appendChild(btn);
   });
-  quizElement.appendChild(choicesDiv);
+  quizElement.appendChild(choices);
 
   const countdown = document.createElement('p');
   countdown.textContent = '30';
   quizElement.appendChild(countdown);
 
-  timerId = setInterval(() => {
+  timer = setInterval(() => {
     let time = Number(countdown.textContent);
     if (time > 0) {
       countdown.textContent = time - 1;
     } else {
-      clearInterval(timerId);
+      clearInterval(timer);
       questionIndex++;
       showQuestion();
     }
   }, 1000);
 }
-
+initQuiz();
 window.addEventListener('load', initQuiz);
