@@ -28,22 +28,24 @@ var questionsArr = [
 
 const quizElement = document.getElementById('quiz');
 let questionIndex = 0;
-let timer;
 let score = 0;
+let timerId;
 
 function initQuiz() {
+  if (timerId) clearInterval(timerId);
+
   quizElement.innerHTML = '';
   const previousScore = localStorage.getItem('previous-score');
 
   if (previousScore) {
-    const scoreShowed = document.createElement('p');
-    scoreShowed.textContent = `Previous Score: ${previousScore}%`;
-    quizElement.appendChild(scoreShowed);
+    const scoreDisplay = document.createElement('p');
+    scoreDisplay.textContent = `Previous Score: ${previousScore}%`;
+    quizElement.appendChild(scoreDisplay);
   }
 
   const startButton = document.createElement('button');
-  startButton.textContent = 'Start Quiz!';
   startButton.id = 'start-quiz';
+  startButton.textContent = 'Start Quiz!';
   startButton.addEventListener('click', startQuiz);
   quizElement.appendChild(startButton);
 }
@@ -55,6 +57,8 @@ function startQuiz() {
 }
 
 function showQuestion() {
+  if (timerId) clearInterval(timerId);
+
   if (questionIndex >= questionsArr.length) {
     const finalScore = Math.round((score / questionsArr.length) * 100);
     localStorage.setItem('previous-score', finalScore);
@@ -69,30 +73,30 @@ function showQuestion() {
   questionText.textContent = currentQuestion.question;
   quizElement.appendChild(questionText);
 
-  const choices = document.createElement('div');
+  const choicesDiv = document.createElement('div');
   currentQuestion.options.forEach(option => {
     const btn = document.createElement('button');
     btn.textContent = option;
     btn.addEventListener('click', () => {
       if (option === currentQuestion.answer) score++;
-      clearInterval(timer);
+      clearInterval(timerId);
       questionIndex++;
       showQuestion();
     });
-    choices.appendChild(btn);
+    choicesDiv.appendChild(btn);
   });
-  quizElement.appendChild(choices);
+  quizElement.appendChild(choicesDiv);
 
   const countdown = document.createElement('p');
   countdown.textContent = '30';
   quizElement.appendChild(countdown);
 
-  timer = setInterval(function() {
+  timerId = setInterval(() => {
     let time = Number(countdown.textContent);
     if (time > 0) {
       countdown.textContent = time - 1;
     } else {
-      clearInterval(timer);
+      clearInterval(timerId);
       questionIndex++;
       showQuestion();
     }
